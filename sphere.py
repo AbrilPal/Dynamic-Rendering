@@ -2,10 +2,8 @@ import numpy as np
 from gl import color
 from mate import punto
 
-blano = color(1,1,1)
-
 class Material(object):
-    def __init__(self, diffuse = blano):
+    def __init__(self, diffuse):
         self.diffuse = diffuse
 
 
