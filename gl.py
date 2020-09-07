@@ -37,12 +37,17 @@ negro = color(0,0,0)
 blanco = color(255,255,255)
 
 # clase principal
-class Render(object):
+class Raytracer(object):
     # inicializa cualquier objeto dentro de la clase Render
     def __init__(self, ancho, alto):
         self.glCreateWindow(ancho, alto)
         # color predeterminado del punto en la pantalla
         self.punto_color = negro
+        # camara
+        self.camPosition = [0, 0, 0]
+        self.fov = 60
+        #scena
+        self.scene = []
 
     def glCreateWindow(self, ancho, alto):
         self.ancho = ancho
@@ -56,20 +61,19 @@ class Render(object):
         self.viewport_ancho = ancho
         self.viewport_alto = alto
 
-        self.viewportMatrix = matrix([[ancho/2, 0, 0, x + ancho/2],
-                                      [0, alto/2, 0, y + alto/2],
-                                      [0, 0, 0.5, 0.5],
-                                      [0, 0, 0, 1]])
-
     # fondo de toda la imagen
     def glClear(self):
         # color de fondo
-        #color_fondo = color_f
         self.pixels = [[azul for x in range(self.ancho)] for y in range(self.alto)]
         self.zbuffer = [ [ -float('inf') for x in range(self.ancho)] for y in range(self.alto) ]
 
     # crear un punto en cualquier lugar de la pantalla 
     def glVertex(self, x, y, color = None):
+        if x < self.viewport_x or x >= self.viewport_x + self.viewport_ancho or y < self.viewport_x or y >= self.viewport_x + self.viewport_alto:
+            return
+
+        if x >= self.ancho or x < 0 or y >= self.alto or y < 0:
+            return
         try:
             self.pixels[y][x] = color or self.punto_color
         except:
@@ -192,3 +196,34 @@ class Render(object):
                 imagen.write(self.pixels[x][y])
                 
         imagen.close()
+
+    def rtRender(self):
+        #pixel por pixel
+        for y in range(self.alto):
+            for x in range(self.ancho):
+
+                # pasar valor de pixel a coordenadas NDC (-1 a 1)
+                Px = 2 * ( (x+0.5) / self.ancho) - 1
+                Py = 2 * ( (y+0.5) / self.alto) - 1
+
+                #FOV(angulo de vision), asumiendo que el near plane esta a 1 unidad de la camara
+                t = tan( (self.fov * np.pi / 180) / 2 )
+                r = t * self.ancho / self.alto
+                Px *= r
+                Py *= t
+
+                #Nuestra camara siempre esta viendo hacia -Z
+                direction = [Px, Py, -1]
+                direction = direction / np.linalg.norm(direction)
+
+                material = None
+
+                for obj in self.scene:
+                    intersect = obj.ray_intersect(self.camPosition, direction)
+                    if intersect is not None:
+                        if intersect.distance < self.zbuffer[y][x]:
+                            self.zbuffer[y][x] = intersect.distance
+                            material = obj.material
+
+                if material is not None:
+                    self.glVertex(x, y, material.diffuse)
