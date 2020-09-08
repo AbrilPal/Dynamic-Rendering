@@ -7,6 +7,7 @@ import random
 import numpy as np
 from numpy import matrix, cos, sin, tan
 from obj import Obj
+from mate import punto, resta_lis, normal_fro
 
 def char(c):
     # 1 byte
@@ -164,7 +165,7 @@ class Raytracer(object):
 
                 #Nuestra camara siempre esta viendo hacia -Z
                 direction = (Px, Py, -1)
-                direction = direction / np.linalg.norm(direction)
+                direction = direction / normal_fro(direction)
 
                 material = None
 
