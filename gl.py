@@ -23,6 +23,8 @@ def dword(d):
 def color(r, g, b):
     return bytes([int(b * 255), int(g * 255), int(r * 255)])
 
+celeste = color(0.4745, 0.549, 0.9686)
+rosado = color(0.98431, 0.74901, 0.988235)
 negro = color(0,0,0)
 blanco = color(1,1,1)
 azul = color(0.015, 0.047, 0.227)
@@ -30,7 +32,7 @@ azul = color(0.015, 0.047, 0.227)
 class Raytracer(object):
     def __init__(self, ancho, alto):
         self.curr_color = blanco
-        self.clear_color = azul
+        self.clear_color = rosado
         self.glCreateWindow(ancho, alto)
         self.camPosition = (0,0,0)
         self.fov = 60
