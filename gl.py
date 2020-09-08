@@ -7,7 +7,7 @@ import random
 import numpy as np
 from numpy import matrix, cos, sin, tan
 from obj import Obj
-from mate import punto, resta_lis, normal_fro
+from mate import normal_fro
 
 def char(c):
     # 1 byte

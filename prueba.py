@@ -7,6 +7,7 @@ from obj import Obj
 from sphere import Sphere, Material
 import random
 
+# materiales
 nieve = Material(diffuse = color(1, 1, 1 ))
 negro = Material(diffuse = color(0, 0, 0 ))
 nariz = Material(diffuse = color(1, 0.65, 0))
@@ -36,6 +37,5 @@ imagen.scene.append( Sphere((0, -0.4,  -4), 0.07, negro) )
 imagen.scene.append( Sphere((0, -0.8,  -4), 0.08, negro) )
 
 imagen.rtRender()
-
 imagen.glFinish('imagen.bmp')
 print("LISTO! la imagen ya esta con el nombre de 'imagen.bmp' ")
