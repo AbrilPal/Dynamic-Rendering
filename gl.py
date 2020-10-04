@@ -7,7 +7,7 @@ import random
 import numpy as np
 from numpy import matrix, cos, sin, tan
 from obj import Obj
-from mate import normal_fro
+from mate import normal_fro, resta_lis, division_lis_fro, punto, multi_N, multColor, sumVectors, mulVectors, multiply
 
 def char(c):
     # 1 byte
@@ -38,6 +38,8 @@ class Raytracer(object):
         self.camPosition = (0,0,0)
         self.fov = 60
         self.scene = []
+        self.pointLight = None
+        self.ambientLight = None
 
     def glCreateWindow(self, ancho, alto):
         self.ancho = ancho
@@ -168,38 +170,71 @@ class Raytracer(object):
                 direction = direction / normal_fro(direction)
 
                 material = None
+                intersectV = None
 
                 for obj in self.scene:
-                    intersect = obj.ray_intersect(self.camPosition, direction)
+                    intersect = obj.ray_intersectt(self.camPosition, direction)
                     if intersect is not None:
                         if intersect.distance < self.zbuffer[y][x]:
                             self.zbuffer[y][x] = intersect.distance
                             material = obj.material
+                            intersectV = intersect
 
-                if material is not None:
-                    self.glVertex(x, y, material.diffuse)
+                if intersectV is not None:
+                    self.glVertex(x, y, self.pointColor(material, intersectV))
 
-                
+    def pointColor(self, material, intersect):
+        objectColor = [material.diffuse[2] / 255,
+                    material.diffuse[1] / 255,
+                    material.diffuse[0] / 255]
 
+        ambientColor = [0,0,0]
+        diffuseColor = [0,0,0]
+        specColor = [0,0,0]
 
+        shadow_intensity = 0
 
+        if self.ambientLight:
+            ambientColor = [self.ambientLight.strength * self.ambientLight.color[2] / 255,
+                            self.ambientLight.strength * self.ambientLight.color[1] / 255,
+                            self.ambientLight.strength * self.ambientLight.color[0] / 255]
 
+        if self.pointLight:
+            # Sacamos la direccion de la luz para este punto
+            light_dirp = resta_lis(self.pointLight.position[0], intersect.point[0], self.pointLight.position[1], intersect.point[1], self.pointLight.position[2], intersect.point[2])
+            light_dirp = division_lis_fro(light_dirp, normal_fro(light_dirp))
 
+            # Calculamos el valor del diffuse color
+            intensityp = self.pointLight.intensity * max(0, punto(light_dirp, intersect.normal[0],intersect.normal[1],intersect.normal[2]))
+            diffuseColor = [intensityp * self.pointLight.color[2] / 255,
+                            intensityp * self.pointLight.color[1] / 255,
+                            intensityp * self.pointLight.color[2] / 255]
 
+            # Iluminacion especular
+            view_dirp = resta_lis(self.camPosition[0], intersect.point[0], self.camPosition[1], intersect.point[1], self.camPosition[2], intersect.point[2])
+            view_dirp = division_lis_fro(view_dirp, normal_fro(view_dirp))
 
+            reflectp=2*(punto(intersect.normal, light_dirp[0],light_dirp[1],light_dirp[2]))
+            reflectp=multi_N(reflectp, intersect.normal)
+            reflectp=resta_lis(reflectp[0], light_dirp[0],reflectp[1], light_dirp[1],reflectp[2], light_dirp[2])
+            spec_intensity = self.pointLight.intensity * (max(0, punto(view_dirp, reflectp[0],reflectp[1],reflectp[2])) ** material.spec)
 
+            specColor = [spec_intensity * self.pointLight.color[2] / 255,
+                        spec_intensity * self.pointLight.color[1] / 255,
+                        spec_intensity * self.pointLight.color[0] / 255]
 
+            for obj in self.scene:
+                if obj is not intersect.sceneObject:
+                    hit = obj.ray_intersectt(intersect.point,  light_dirp)
+                    if hit is not None and intersect.distance < normal_fro(resta_lis(self.pointLight.position[0], intersect.point[0],self.pointLight.position[1], intersect.point[1],self.pointLight.position[2], intersect.point[2])):
+                        shadow_intensity = 1
 
+        # Formula de iluminacion
+        finalColorp = mulVectors(sumVectors(ambientColor, multiply((1 - shadow_intensity), sumVectors(diffuseColor, specColor))), objectColor)
+        #Nos aseguramos que no suba el valor de color de 1
 
-                
+        r = min(1,finalColorp[0])
+        g = min(1,finalColorp[1])
+        b = min(1,finalColorp[2])
 
-
-
-
-
-
-
-
-
-
-
+        return color(r, g, b)

@@ -4,7 +4,7 @@
 
 from gl import Raytracer, color
 from obj import Obj
-from sphere import Sphere, Material
+from sphere import Sphere, Material,PointLight, AmbientLight
 import random
 
 # materiales
@@ -13,7 +13,11 @@ negro = Material(diffuse = color(0, 0, 0 ))
 nariz = Material(diffuse = color(1, 0.65, 0))
 gris = Material(diffuse = color(0.77647, 0.76078, 0.77647))
 
-imagen = Raytracer(400,600)
+imagen = Raytracer(800,1000)
+
+imagen.pointLight = PointLight(position = (-1,1,2), intensity = 0.5)
+imagen.ambientLight = AmbientLight(strength = 0.1)
+
 # cuerpo
 imagen.scene.append( Sphere((0, 0.8,  -5), 0.5, nieve) )
 imagen.scene.append( Sphere((0, 0, -5), 0.6, nieve) )

@@ -90,3 +90,33 @@ def zeros_matrix(rows, cols):
             m[-1].append(0.0)
 
     return m
+
+def multi_N(c, normal):
+    return (normal[0]*c,normal[1]*c,normal[2]*c)
+
+def multColor(v1,v2):
+    res=[]
+    res.append(v1[0]*v2[0])
+    res.append(v1[1]*v2[1])
+    res.append(v1[2]*v2[2])
+    return res
+
+def sumVectors(vec1, vec2):
+    sumList = []
+    sumList.extend((vec1[0] + vec2[0], vec1[1] + vec2[1], vec1[2] + vec2[2]))
+    return sumList
+
+def mulVectors(vec1, vec2):
+    mulList = []
+    mulList.extend((vec1[0] * vec2[0], vec1[1] * vec2[1], vec1[2] * vec2[2]))
+    return mulList
+
+def multiply(dotNumber, normal):
+    arrMul = []
+    arrMul.extend((dotNumber * normal[0], dotNumber * normal[1], dotNumber * normal[2]))
+    return arrMul
+
+def subVectors(vec1, vec2):
+    subList = []
+    subList.extend((vec1[0] - vec2[0], vec1[1] - vec2[1], vec1[2] - vec2[2]))
+    return subList
