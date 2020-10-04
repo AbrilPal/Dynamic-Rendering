@@ -1,6 +1,6 @@
 # Andrea Abril Palencia Gutierrez, 18198
 # Graficas por computadora, seccion 20
-# 04/08/2020
+# 04/10/2020
 
 def normal_fro(norm):
     return((norm[0]**2+norm[1]**2+norm[2]**2)**(1/2))

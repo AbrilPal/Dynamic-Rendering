@@ -1,6 +1,6 @@
 # Andrea Abril Palencia Gutierrez, 18198
-# DR1: Spheres and Materials --- Graficas por computadora, seccion 20
-# 31/08/2020 - 07/09/2020
+# DR2: Light and Shadows --- Graficas por computadora, seccion 20
+# 14/09/2020 - 21/09/2020
 
 from gl import Raytracer, color
 from obj import Obj
