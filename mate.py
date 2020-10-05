@@ -10,6 +10,13 @@ def resta_lis(x0, x1, y0, y1, z0, z1):
     arr_sub.extend((x0 - x1, y0 - y1, z0 - z1))
     return arr_sub
 
+def add( v1, v2):
+    res=[]
+    res.append(v1[0]+v2[0])
+    res.append(v1[1]+v2[1])
+    res.append(v1[2]+v2[2])
+    return res
+
 def division_lis_fro(norm, frobenius):
     if (frobenius==0):
         resultado=[]
