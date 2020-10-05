@@ -7,7 +7,12 @@ import random
 import numpy as np
 from numpy import matrix, cos, sin, tan
 from obj import Obj, Envmap
-from mate import normal_fro, resta_lis, division_lis_fro, punto, multi_N, multColor, sumVectors, mulVectors, multiply, subVectors
+from mate import normal_fro, resta_lis, division_lis_fro, punto, multi_N, multColor, sumVectors, mulVectors, multiply, subVectors, dotVectors
+
+OPAQUE = 0
+REFLECTIVE = 1
+TRANSPARENT = 2
+MAX_RECURSION_DEPTH = 3
 
 def char(c):
     # 1 byte
@@ -23,6 +28,60 @@ def dword(d):
 
 def color(r, g, b):
     return bytes([int(b * 255), int(g * 255), int(r * 255)])
+
+def reflectVector(normal, dirVector):
+    # R = 2 * (N dot L) * N - L
+    reflect = 2 * np.dot(normal, dirVector)
+    reflect = np.multiply(reflect, normal)
+    reflect = np.subtract(reflect, dirVector)
+    reflect = reflect / np.linalg.norm(reflect)
+    return reflect
+
+def refractVector(N, I, ior):
+    # N = normal
+    # I = incident vector
+    # ior = index of refraction
+    # Snell's Law
+    cosi = max(-1, min(1, np.dot(I, N)))
+    etai = 1
+    etat = ior
+
+    if cosi < 0:
+        cosi = -cosi
+    else:
+        etai, etat = etat, etai
+        N = np.array(N) * -1
+
+    eta = etai/etat
+    k = 1 - eta * eta * (1 - (cosi * cosi))
+
+    if k < 0: # Total Internal Reflection
+        return None
+    
+    R = eta * np.array(I) + (eta * cosi - k**0.5) * N
+    return R / np.linalg.norm(R)
+
+def fresnel(N, I, ior):
+    # N = normal
+    # I = incident vector
+    # ior = index of refraction
+    cosi = max(-1, min(1, np.dot(I, N)))
+    etai = 1
+    etat = ior
+
+    if cosi > 0:
+        etai, etat = etat, etai
+
+    sint = etai / etat * (max(0, 1 - cosi * cosi) ** 0.5)
+
+    if sint >= 1: # Total Internal Reflection
+        return 1
+
+    cost = max(0, 1 - sint * sint) ** 0.5
+    cosi = abs(cosi)
+    Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost))
+    Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost))
+    return (Rs * Rs + Rp * Rp) / 2
 
 celeste = color(0.4745, 0.549, 0.9686)
 rosado = color(0.98431, 0.74901, 0.988235)
@@ -169,19 +228,7 @@ class Raytracer(object):
                 direction = (Px, Py, -1)
                 direction = direction / normal_fro(direction)
 
-                material = None
-                intersect = None
-
-                for obj in self.scene:
-                    intersect = obj.ray_intersectt(self.camPosition, direction)
-                    if intersect is not None:
-                        if intersect.distance < self.zbuffer[y][x]:
-                            self.zbuffer[y][x] = intersect.distance
-                            material = obj.material
-                            intersect = intersect
-
-                if intersect is not None:
-                    self.glVertex(x, y, self.pointColor(material, intersect))
+                self.glVertex(x, y, self.castRay(self.camPosition, direction))
 
     def pointColor(self, material, intersect):
         objectColor = [material.diffuse[2] / 255,
@@ -245,14 +292,14 @@ class Raytracer(object):
 
         for obj in self.scene:
             if obj is not origObj:
-                intersect = obj.ray_intersectt(orig, direction)
-                if intersect is not None:
-                    if intersect.distance < tempZbuffer:
-                        tempZbuffer = intersect.distance
+                hit = obj.ray_intersectt(orig, direction)
+                if hit is not None:
+                    if hit.distance < tempZbuffer:
+                        tempZbuffer = hit.distance
                         material = obj.material
-                        intersect = intersect
-        return material, intersect
+                        intersect = hit
 
+        return material, intersect
 
     def castRay(self, orig, direction, origObj = None, recursion = 0):
 
