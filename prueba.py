@@ -77,8 +77,28 @@ imagen.scene.append(AABB((-7, -1, -30), 2, ladrillo))
 imagen.scene.append(AABB((-7, 1, -30), 2, ladrillo))
 imagen.scene.append(AABB((-7, 3, -30), 2, ladrillo))
 imagen.scene.append(AABB((-7, 5, -30), 2, ladrillo))
-# imagen.scene.append(AABB((-7, 7, -30), 2, ladrillo))
-# imagen.scene.append(AABB((-7, 9, -30), 2, ladrillo))
+imagen.scene.append(AABB((-7, 7, -30), 2, ladrillo))
+imagen.scene.append(AABB((-7, 9, -30), 2, ladrillo))
+# arbol 2
+# tronco
+imagen.scene.append(AABB((13, -3.5, -25), 1, madera))
+imagen.scene.append(AABB((13, -2.5, -25), 1, madera))
+imagen.scene.append(AABB((13, -1.5, -25), 1, madera))
+imagen.scene.append(AABB((13, -0.5, -25), 1, madera))
+# hojas
+imagen.scene.append(Sphere((12, 0.2,-24), 1.2, grama))
+imagen.scene.append(Sphere((13, 0,-25), 1.5, grama))
+imagen.scene.append(Sphere((14.5, 1,-26), 1, grama))
+# arbol 3
+# tronco
+imagen.scene.append(AABB((16, -3.5, -20), 1, madera))
+imagen.scene.append(AABB((16, -2.5, -20), 1, madera))
+imagen.scene.append(AABB((16, -1.5, -20), 1, madera))
+imagen.scene.append(AABB((16, -0.5, -20), 1, madera))
+# hojas
+imagen.scene.append(Sphere((14.3, 0.5,-19.7), 1.2, grama))
+imagen.scene.append(Sphere((16, 0,-20), 1.5, grama))
+
 
 
 imagen.rtRender()
