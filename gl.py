@@ -98,6 +98,7 @@ class Raytracer(object):
         self.fov = 60
         self.scene = []
         self.pointLight = None
+        self.dirLight = None
         self.ambientLight = None
 
     def glCreateWindow(self, ancho, alto):
@@ -357,6 +358,13 @@ class Raytracer(object):
         
         if material.matType == OPAQUE:
             finalColor = sumVectors(ambientColor, multiply((1 - shadow_intensity), sumVectors(diffuseColor, specColor)))
+            if material.texture and intersect.texCoords:
+                texColor = material.texture.getColor(intersect.texCoords[0], intersect.texCoords[1])
+
+                finalColor *= np.array([texColor[2] / 255,
+                                        texColor[1] / 255,
+                                        texColor[0] / 255])
+
         elif material.matType == REFLECTIVE:
             reflect = reflectVector(intersect.normal, direction * -1)
             reflectColor = self.castRay(intersect.point, reflect, intersect.sceneObject, recursion + 1)

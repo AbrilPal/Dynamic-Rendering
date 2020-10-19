@@ -2,7 +2,9 @@
 # Graficas por computadora, seccion 20
 # 17/08/2020 - 24/08/2020
 
+import numpy as np
 import struct
+from numpy import arccos, arctan2 
 
 def color(r, g, b):
     return bytes([int(b * 255), int(g * 255), int(r * 255)])
